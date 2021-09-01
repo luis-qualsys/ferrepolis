@@ -1,0 +1,25 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+
+    <!-- fer_product_brand tree view -->
+    <record id="fer_product_brand_view_tree" model="ir.ui.view">
+        <field name="name">fer.product.brand.view.tree</field>
+        <field name="model">fer.product.brand</field>
+        <field name="arch" type="xml">
+            <tree editable="bottom">
+                <field name="fer_brand_name"/>
+                <field name="fer_brand_code"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- fer_product_brand action window -->
+    <record id="fer_product_brand_action" model="ir.actions.act_window">
+        <field name="name">Marcas</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">fer.product.brand</field>
+        <field name="view_mode">tree</field>
+    </record>
+
+    <menuitem id="fer_product_brand_menu" parent="stock.menu_product_in_config_stock" action="fer_product_brand_action" />
+</odoo>

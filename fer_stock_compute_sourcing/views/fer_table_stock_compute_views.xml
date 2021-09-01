@@ -1,0 +1,44 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+
+    <!-- stock.computer.parms form view -->
+    <record id="fer_stock_computer_parms_view_form" model="ir.ui.view">
+        <field name="name">fer.stock.computer.parms.view.form</field>
+        <field name="model">fer.stock.computer.parms</field>
+        <field name="arch" type="xml">
+            <form string="Configuración de cálculos de abastecimiento">
+                <sheet>
+                    <div>
+                        <p>
+                            <i>Tablas de configuración de cálculos</i> define los parametros para generar los cálculos de abastecimiento de productos. 
+                        </p>
+                    </div>
+                    <notebook>
+                        <page string="Clasificador de Stock">
+                            <group>
+                                <field name="fer_letters_id">
+                                    <tree editable="bottom">
+                                    <field name="fer_letter"/>
+                                    <field name="fer_percent"/>
+                                    <field name="fer_days_min_stock"/>
+                                    <field name="fer_days_max_stock"/>
+                                    </tree>
+                                </field>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- fer_stock_computer_parms action window -->
+    <record id="fer_stock_computer_parms_action" model="ir.actions.act_window">
+        <field name="name">Parámetros de abastecimiento</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">fer.stock.computer.parms</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem id="fer_table_stock_computer_parms_menu" name="Configuraciones de abastecimiento" parent="stock.menu_product_in_config_stock" action="fer_stock_computer_parms_action" />
+</odoo>

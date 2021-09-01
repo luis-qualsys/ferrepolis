@@ -1,0 +1,48 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+    <!-- fer.wizard.stock.weeks.compute form view -->
+    <record id="fer_wizard_stock_weeks_compute_view_form" model="ir.ui.view">
+        <field name="name">fer.wizard.stock.weeks.compute.view.form</field>
+        <field name="model">fer.wizard.stock.weeks.compute</field>
+        <field name="arch" type="xml">
+            <form string="">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="fer_date_now"/>
+                            <field name="location_id"/>
+                            <field name="fer_product_init"/>
+                        </group>
+                        <group>
+                            <field name="fer_brand"/>
+                            <field name="fer_product_end"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Parametros">
+                            <group>
+                                <field name="fer_period_hist"/>
+                                <field name="fer_sale_max"/>
+                                <field name="fer_sale_min"/>
+                                <field name="fer_days_lab"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <footer>
+                    <button name="week_sourcing_calculation" string="Calcular" type="object" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel" />
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="fer_wizard_stock_weeks_compute_action" model="ir.actions.act_window">
+        <field name="name">Cálculo de stock (semanas)</field>
+        <field name="res_model">fer.wizard.stock.weeks.compute</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <menuitem action="fer_wizard_stock_weeks_compute_action" id="fer_menu_sourcing_stock_weeks_compute" parent="stock.menu_stock_warehouse_mgmt"/>
+</odoo>
