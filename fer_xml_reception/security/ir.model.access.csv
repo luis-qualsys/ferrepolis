@@ -1,0 +1,4 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_fer_supplier_invoice,access_fer_supplier_invoice,model_fer_supplier_invoice,base.group_user,1,1,1,1
+access_log_invoice_line,access_log_invoice_line,model_log_invoice_line,base.group_user,1,1,1,1
+access_message_wizard,access_message_wizard,model_message_wizard,base.group_user,1,1,1,1

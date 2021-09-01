@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="fer_supplier_portal_form_view" model="ir.ui.view">
+        <field name="name">fer.supplier.portal.form.view</field>
+        <field name="model">fer.supplier.invoice</field>
+        <field name="arch" type="xml">
+            <form string="Factura de proveedor" duplicate="false">
+                <div class="oe_title">
+                    <span class="o_form_label">Factura de proveedor</span>
+                    <h1>
+                        <field name="name" readonly="1" force_save="1"/>
+                    </h1>
+                </div>
+                <group>
+                    <field name="fer_cfdi_xml_name" invisible="1"/>
+                    <field name="fer_cfdi_xml" filename="fer_cfdi_xml_name" required="1" />
+                </group>
+                <footer>
+                    <button name="action_create" type="object" string="Guardar" class="btn-primary" />
+                    <button special="cancel" string="Descartar" class="btn-secondary" />
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="fer_supplier_portal_action" model="ir.actions.act_window">
+        <field name="name">Cargar factura</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">fer.supplier.invoice</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="fer_supplier_portal_form_view" />
+        <field name="target">new</field>
+    </record>
+</odoo>
