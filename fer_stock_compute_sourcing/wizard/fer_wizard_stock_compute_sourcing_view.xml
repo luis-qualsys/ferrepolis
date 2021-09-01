@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="fer_wizard_stock_compute_sourcing_form_view" model="ir.ui.view">
+        <field name="name">fer.wizard.stock.compute.sourcing.form.view</field>
+        <field name="model">fer.wizard.stock.compute.sourcing</field>
+        <field name="arch" type="xml">
+            <form string="Parametros">
+                <p>
+                Los valores de stock serán calculados.
+                </p>
+                <notebook>
+                    <page string="Parametros">
+                        <group>
+                            <group>
+                                <field name="location_id"/>
+                                <field name="fer_product_id_init"/>
+                                <field name="fer_date_init"/>
+                                <field name="fer_omit_days"/>
+                            </group>
+                            <group>
+                                <field name="fer_brand"/>
+                                <field name="fer_product_id_end"/>
+                                <field name="fer_date_end"/>
+                                <field name="fer_check_selector" widget="radio"/>
+                            </group>
+                        </group>
+                    </page>
+                    <page string="Clientes a Omitir" attrs="{'invisible': [('fer_check_selector', '!=', 'partners')]}">
+                        <group>
+                            <field name="partner_id"/>
+                        </group>
+                    </page>
+                    <page string="Facturas a Omitir" attrs="{'invisible': [('fer_check_selector', '!=', 'invoices')]}">
+                        <group>
+                            <field name="account_ids"/>
+                        </group>
+                    </page>
+                </notebook>
+                <footer>
+                    <button name="sourcing_calculation" string="Calcular" type="object" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel" />
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="fer_wizard_stock_compute_sourcing_action" model="ir.actions.act_window">
+        <field name="name">Cálculo de stock</field>
+        <field name="res_model">fer.wizard.stock.compute.sourcing</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <menuitem action="fer_wizard_stock_compute_sourcing_action" id="fer_menu_sourcing_stock_compute" parent="stock.menu_stock_warehouse_mgmt"/>
+
+</odoo>
