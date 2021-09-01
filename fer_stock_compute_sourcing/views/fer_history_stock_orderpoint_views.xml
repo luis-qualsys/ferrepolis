@@ -1,0 +1,75 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+    <!-- fer_history_stock_orderpoint form view -->
+    <record id="fer_history_stock_orderpoint_view_form" model="ir.ui.view">
+        <field name="name">fer.history.stock.orderpoint.view.form</field>
+        <field name="model">fer.history.stock.orderpoint</field>
+        <field name="arch" type="xml">
+            <form string="">
+                <header>
+                    <button name="action_calculed_recover" string="Validar" class="btn-primary" type="object" attrs="{'invisible': [('fer_state', '!=', 'draft')]}"/>
+                    <button name="action_hist_recover" string="Restaurar" class="btn-primary" type="object" attrs="{'invisible': [('fer_state', '!=', 'applied')]}"/>
+                    <button name="action_draft_state" string="Cambiar a borrador" class="btn-primary" type="object" attrs="{'invisible': [('fer_state', '!=', 'restored')]}"/>
+                    <button name="action_cancel_compute" string="Cancelar" class="btn-primary" type="object" attrs="{'invisible': [('fer_state', '!=', 'draft')]}"/>
+                    <field name="fer_state" widget="statusbar" statusbar_visible="draft,applied,restored"/>
+                </header>
+                <sheet>
+                    <group>
+                        <!-- <group>
+                            <field name="fer_description"/>
+                        </group> -->
+                        <group>
+                            <field name="fer_timestamp"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Reglas efimeras de abastecimiento">
+                            <group>
+                                <field string="Reglas de abastecimiento" name="fer_stock_rules_efim_ids">
+                                    <tree editable="bottom">
+                                        <field name="product_id"/>
+                                        <field name="location_id"/>
+                                        <field name="fer_c_product_min"/>
+                                        <field name="fer_c_product_max"/>
+                                        <field name="fer_old_product_min"/>
+                                        <field name="fer_old_product_max"/>
+                                    </tree>
+                                </field>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- fer.history.stock.orderpoint tree view -->
+    <record id="model_name_view_tree" model="ir.ui.view">
+        <field name="name">fer.history.stock.orderpoint.view.tree</field>
+        <field name="model">fer.history.stock.orderpoint</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="fer_name"/>
+                <!-- <field name="fer_description"/> -->
+                <field name="fer_state" optional="show" widget="badge" decoration-danger="fer_state == 'cancelled'" decoration-success="fer_state == 'applied'" decoration-info="fer_state == 'restored'" decoration-muted="fer_state == 'draft'"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- fer_history_stock_orderpoint action window -->
+    <record id="fer_history_stock_orderpoint_action" model="ir.actions.act_window">
+        <field name="name">Aplicar reglas de stock</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">fer.history.stock.orderpoint</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="oe_view_nocontent_create">
+                Aplicar reglas de stock
+            </p><p>
+                Almacenamiento de reglas de abastecimiento de stock.
+            </p>
+        </field>
+    </record>
+    <!-- This Menu Item must have a parent and an action -->
+    <menuitem id="fer_history_stock_orderpoint_menu" name="Aplicar reglas de stock" parent="stock.menu_stock_warehouse_mgmt" action="fer_history_stock_orderpoint_action" />
+</odoo>
