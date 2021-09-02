@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="fer_xml_invoice_form2" model="ir.ui.view">
+        <field name="name">fer.xml.invoice.form2</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_form"/>
+        <field name="arch" type="xml">
+            <div name="button_box" position="inside">
+                <button class="oe_stat_button" name="%(fer_xml_reception.fer_supplier_portal_action)d" type="action"
+                    icon="fa-file-text" string="Subir XML" 
+                    attrs="{'invisible':[
+                    '|','|',('fer_invoice','!=',False),
+                    ('fer_category','not in','Mayorista'),
+                    '&amp;',('state','not in','sent'),
+                    '|',
+                    ('state','not in','draft'),
+                    ('fer_log_invoice_lines','=',[]),
+                    ]}">
+                </button>
+                <button class="oe_stat_button" name="delete_xml" type="object"
+                    icon="fa-file-text" string="Revertir XML"  
+                    attrs="{'invisible':[
+                    '|','|',
+                    ('fer_invoice','=',False),
+                    ('fer_category','not in','Mayorista'),
+                    '&amp;',('state','not in','sent'),
+                    '|',
+                    ('state','not in','draft'),
+                    ('fer_log_invoice_lines','=',[]),
+                    ]}">
+                </button>
+            </div>
+        </field>
+    </record>
+</odoo>
