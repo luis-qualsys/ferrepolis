@@ -9,7 +9,7 @@ class FerComputeModelSearch(models.Model):
     fer_product_id_init = fields.Integer(string='Producto inicial')
     fer_product_id_end = fields.Integer(string='Producto final')
     warehouse_id = fields.Many2one('stock.warehouse', string='Almacen')
-    location_id = fields.Many2one('stock.location', string='Ubicación')
+    location_id = fields.Many2one('stock.location', string='Ubicación', required=True)
     fer_brand = fields.Many2one('fer.product.brand', string='Marca')
     fer_date_init = fields.Date(string='Periodo de inicio', required=True, default=lambda date: fields.Date.today() - relativedelta(days=10))
     fer_date_end = fields.Date(string='Periodo de termino', default=lambda date: fields.Date.today(), required=True)
