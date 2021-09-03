@@ -8,7 +8,7 @@
         <field name="arch" type="xml">
             <tree editable="bottom">
                 <field name="fer_brand_name"/>
-                <field name="fer_brand_code"/>
+                <field name="fer_brand_active" widget="checkbox"/>
             </tree>
         </field>
     </record>

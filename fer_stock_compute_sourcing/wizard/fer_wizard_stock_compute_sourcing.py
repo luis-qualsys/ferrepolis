@@ -45,14 +45,14 @@ class FerWizardStockComputeSourcing(models.TransientModel):
             product = self.env['fer.letters'].search([
                 ('fer_letter', '=', stock['fer_product_letter'])
                 ])
-            stk_min = round(product.fer_days_min_stock * stock['fer_product_average']) # Comentar si no se el minimo
+            # stk_min = round(product.fer_days_min_stock * stock['fer_product_average']) # Comentar si no se cacula el minimo
             stk_max = round(product.fer_days_max_stock * stock['fer_product_average'])
             if stk_max < stock['fer_old_product_min']:
                 stock['fer_c_product_min'] = stock['fer_old_product_min']
                 stock['fer_c_product_max'] = stock['fer_old_product_max']
             else:
-                # stock['fer_c_product_min'] = stock['fer_old_product_min'] # Descomentar si no se el minimo
-                stock['fer_c_product_min'] = stk_min
+                stock['fer_c_product_min'] = stock['fer_old_product_min'] # Descomentar si no se cacula el minimo
+                # stock['fer_c_product_min'] = stk_min
                 stock['fer_c_product_max'] = stk_max
 
         return stock_to_created
@@ -126,10 +126,10 @@ class FerWizardStockComputeSourcing(models.TransientModel):
             # Obtener promedios
             for key in dic_products.keys():
                 if key in invoices_desc:
-                    average = (dic_products[key] - invoices_desc[key]) / record.fer_timelapse
+                    average = (dic_products[key] - invoices_desc[key]) /  (record.fer_timelapse - record.fer_omit_days)
                     self.fer_make_dictionary_templates(dic_averages, key, average)
                 else:
-                    average = dic_products[key] / record.fer_timelapse
+                    average = dic_products[key] /  (record.fer_timelapse - record.fer_omit_days)
                     self.fer_make_dictionary_templates(dic_averages, key, average)
 
             # Obtener participation
@@ -149,14 +149,14 @@ class FerWizardStockComputeSourcing(models.TransientModel):
             letters = {item.fer_letter:item.fer_percent for item in word}
             for key in dic_participation.keys():
                 val =  dic_participation[key]
-                if letters['A'] >= val:
-                    self.fer_make_dictionary_templates(dic_words, key, 'A')
+                if letters['C'] == val:
+                    self.fer_make_dictionary_templates(dic_words, key, 'C')
                     continue
-                elif letters['A'] < val and val <= letters['B']:
+                elif letters['C'] > val and val >= letters['B']:
                     self.fer_make_dictionary_templates(dic_words, key, 'B')
                     continue
                 else:
-                    self.fer_make_dictionary_templates(dic_words, key, 'C')
+                    self.fer_make_dictionary_templates(dic_words, key, 'A')
         _logger.info("Calculos finalizados")
         return dic_products, dic_averages, dic_cumulative, dic_words, dic_participation
 
