@@ -115,3 +115,4 @@ class FerHistoryStockOrderpoint(models.Model):
 
     def action_cancel_compute(self):
         self.fer_state = 'cancelled'
+        return {'type': 'ir.actions.client', 'tag': 'reload'}
