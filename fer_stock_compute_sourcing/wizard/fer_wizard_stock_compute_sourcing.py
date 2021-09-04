@@ -45,15 +45,15 @@ class FerWizardStockComputeSourcing(models.TransientModel):
             product = self.env['fer.letters'].search([
                 ('fer_letter', '=', stock['fer_product_letter'])
                 ])
-            # stk_min = round(product.fer_days_min_stock * stock['fer_product_average']) # Comentar si no se cacula el minimo
+            stk_min = round(product.fer_days_min_stock * stock['fer_product_average']) # Comentar si no se cacula el minimo
             stk_max = round(product.fer_days_max_stock * stock['fer_product_average'])
-            if stk_max < stock['fer_old_product_min']:
-                stock['fer_c_product_min'] = stock['fer_old_product_min']
-                stock['fer_c_product_max'] = stock['fer_old_product_max']
-            else:
-                stock['fer_c_product_min'] = stock['fer_old_product_min'] # Descomentar si no se cacula el minimo
-                # stock['fer_c_product_min'] = stk_min
-                stock['fer_c_product_max'] = stk_max
+            # if stk_max < stock['fer_old_product_min']:
+            # stock['fer_c_product_min'] = stock['fer_old_product_min']
+            # stock['fer_c_product_max'] = stock['fer_old_product_max']
+            # else:
+            #     stock['fer_c_product_min'] = stock['fer_old_product_min'] # Descomentar si no se cacula el minimo
+            stock['fer_c_product_min'] = stk_min
+            stock['fer_c_product_max'] = stk_max
 
         return stock_to_created
 
@@ -141,8 +141,10 @@ class FerWizardStockComputeSourcing(models.TransientModel):
             participative = sorted(dic_cumulative.items(), key=itemgetter(0), reverse=True)
             cumulative = 0
             for tupla in participative:
-                cumulative += tupla[1]
-                self.fer_make_dictionary_templates(dic_participation, tupla[0], cumulative)
+                for key in dic_cumulative.keys():
+                    if tupla[0] == key:
+                        cumulative += tupla[1]
+                        self.fer_make_dictionary_templates(dic_participation, tupla[0], cumulative)
 
             # Asignación de Letras
             word = self.env['fer.letters'].search([])
