@@ -116,12 +116,12 @@ class FerWizardStockComputeSourcing(models.TransientModel):
                 for stock in stock_move:
                     if int(stock.product_id.default_code) in products_range['products_update']:
                         if products_range['brand']:
-                            if products_range['location'] in stock.location_id.display_name and stock.picking_location_dest_id.name == 'Customers' and stock.product_id.fer_brand_ids.fer_brand_name == products_range['brand']:
+                            if stock.picking_location_dest_id.name == 'Customers' and stock.product_id.fer_brand_ids.fer_brand_name == products_range['brand']:
                                 self.fer_make_dictionary_templates(dic_products, stock.product_id.id, stock.qty_done)
                                 if 'Piso' not in stock.location_id.display_name:
                                     dic_stock[stock.product_id.id] = stock.location_id.display_name
                         else:
-                            if products_range['location'] in stock.location_id.display_name and stock.picking_location_dest_id.name == 'Customers':
+                            if stock.picking_location_dest_id.name == 'Customers':
                                 self.fer_make_dictionary_templates(dic_products, stock.product_id.id, stock.qty_done)
                                 if 'Piso' not in stock.location_id.display_name:
                                     dic_stock[stock.product_id.id] = stock.location_id.display_name
@@ -130,12 +130,12 @@ class FerWizardStockComputeSourcing(models.TransientModel):
             else:
                 for stock in stock_move:
                     if products_range['brand']:
-                        if products_range['location'] in stock.location_id.display_name and stock.picking_location_dest_id.name == 'Customers' and stock.product_id.fer_brand_ids.fer_brand_name == products_range['brand']:
+                        if stock.picking_location_dest_id.name == 'Customers' and stock.product_id.fer_brand_ids.fer_brand_name == products_range['brand']:
                             self.fer_make_dictionary_templates(dic_products, stock.product_id.id, stock.qty_done)
                             if 'Piso' not in stock.location_id.display_name:
                                 dic_stock[stock.product_id.id] = stock.location_id.display_name
                     else:
-                        if products_range['location'] in stock.location_id.display_name and stock.picking_location_dest_id.name == 'Customers':
+                        if stock.picking_location_dest_id.name == 'Customers':
                             self.fer_make_dictionary_templates(dic_products, stock.product_id.id, stock.qty_done)
                             if 'Piso' not in stock.location_id.display_name:
                                 dic_stock[stock.product_id.id] = stock.location_id.display_name
@@ -168,10 +168,10 @@ class FerWizardStockComputeSourcing(models.TransientModel):
             letters = {item.fer_letter:item.fer_percent for item in word}
             for key in dic_participation.keys():
                 val =  dic_participation[key]
-                if letters['C'] == val:
+                if letters['C'] == round(val):
                     self.fer_make_dictionary_templates(dic_words, key, 'C')
                     continue
-                elif letters['C'] > val and val >= letters['B']:
+                elif letters['C'] > round(val) and round(val) >= letters['B']:
                     self.fer_make_dictionary_templates(dic_words, key, 'B')
                     continue
                 else:
@@ -237,19 +237,20 @@ class FerWizardStockComputeSourcing(models.TransientModel):
         #         # prod_keys.remove(key)
 
         for rule in old_stock_rules:
-            if rule.product_id.id in prod_keys and rule.location_id.complete_name == stock[rule.product_id.id]:
-                stock_dicts.append({
-                    'fer_qty_done' : products[rule.product_id.id],
-                    'fer_product_average': averages[rule.product_id.id],
-                    'fer_product_participation': cumulative[rule.product_id.id],
-                    'fer_product_cumulative': participation[rule.product_id.id],
-                    'fer_product_letter': words[rule.product_id.id],
-                    'product_id': rule.product_id.id,
-                    'location_id': rule.location_id.id,
-                    'fer_old_product_min': rule.product_min_qty,
-                    'fer_old_product_max': rule.product_max_qty,
-                    })
-                continue
+            if rule.product_id.id in prod_keys:
+                if rule.product_id.id in stock.keys():
+                    stock_dicts.append({
+                        'fer_qty_done' : products[rule.product_id.id],
+                        'fer_product_average': averages[rule.product_id.id],
+                        'fer_product_participation': cumulative[rule.product_id.id],
+                        'fer_product_cumulative': participation[rule.product_id.id],
+                        'fer_product_letter': words[rule.product_id.id],
+                        'product_id': rule.product_id.id,
+                        'location_id': rule.location_id.id,
+                        'fer_old_product_min': rule.product_min_qty,
+                        'fer_old_product_max': rule.product_max_qty,
+                        })
+                    continue
 
         # for key in prod_keys:
         #     stock_dicts.append({'product_id': key,
@@ -261,5 +262,4 @@ class FerWizardStockComputeSourcing(models.TransientModel):
         #         'fer_old_product_min': 0,
         #         'fer_old_product_max': 0,
         #         })
-
         return stock_dicts
