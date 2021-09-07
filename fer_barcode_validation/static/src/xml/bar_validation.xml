@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+<template id="barcode_extend_assets" inherit_id="stock_barcode.assets_backend">
+   <xpath expr="." position="inside">
+       <!-- <script type="text/javascript" src="/fer_barcode_validation/static/src/js/bar_validation.js"/> -->
+       <script type="text/javascript" src="/fer_barcode_validation/static/src/js/bar_validation_line.js"/>
+       <script type="text/javascript" src="/fer_barcode_validation/static/src/js/bar_validation_client.js"/>
+   </xpath>
+</template>
+</odoo>
