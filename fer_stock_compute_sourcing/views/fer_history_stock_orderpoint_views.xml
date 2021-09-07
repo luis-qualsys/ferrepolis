@@ -24,18 +24,16 @@
                     </group>
                     <notebook>
                         <page string="Reglas efimeras de abastecimiento">
-                            <group>
-                                <field string="Reglas de abastecimiento" name="fer_stock_rules_efim_ids">
-                                    <tree editable="bottom">
-                                        <field name="product_id"/>
-                                        <field name="location_id"/>
-                                        <field name="fer_c_product_min"/>
-                                        <field name="fer_c_product_max"/>
-                                        <field name="fer_old_product_min"/>
-                                        <field name="fer_old_product_max"/>
-                                    </tree>
-                                </field>
-                            </group>
+                            <field string="Reglas de abastecimiento" widget="one2many" name="fer_stock_rules_efim_ids">
+                                <tree editable="bottom">
+                                    <field name="product_id"/>
+                                    <field name="location_id"/>
+                                    <field name="fer_c_product_min"/>
+                                    <field name="fer_c_product_max"/>
+                                    <field name="fer_old_product_min"/>
+                                    <field name="fer_old_product_max"/>
+                                </tree>
+                            </field>
                         </page>
                     </notebook>
                 </sheet>
