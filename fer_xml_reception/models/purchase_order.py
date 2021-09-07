@@ -113,19 +113,36 @@ class PurchaseOrder(models.Model):
 
     def download_txt(self):
         self.state='sent'
-        nombre="Solicitud de presupuesto - "+self.name+".txt"
-        data = open(nombre,'w+')
+        nombre="Solicitud"+self.name+".txt"
+        ruta ="/odoo14hd/odoo14hd-server/Odoo_14hd/" + nombre
+        # ruta ="/odoo/odoo-server/" + nombre
+        data = open(ruta,'w+')
         data.write("%s \r\n" % self.partner_id.ref)
         for line in self.order_line:
             data.write("%s,%d\r\n" % (line.product_id.default_code,int(line.product_qty)))
         file_data = data.read()
         data.close()
-        self.fer_txt = base64.b64encode(open(nombre, "rb").read())
+        self.fer_txt = base64.b64encode(open(ruta, "rb").read())
         return {
             'type': 'ir.actions.act_url',
             'name': 'contract',
             'url': '/web/content/purchase.order/%s/fer_txt/%s?download=true' %(self.id,nombre),
         }
+    # def download_txt(self):
+    #     self.state='sent'
+    #     nombre="Solicitud de presupuesto - "+self.name+".txt"
+    #     data = open(nombre,'w+')
+    #     data.write("%s \r\n" % self.partner_id.ref)
+    #     for line in self.order_line:
+    #         data.write("%s,%d\r\n" % (line.product_id.default_code,int(line.product_qty)))
+    #     file_data = data.read()
+    #     data.close()
+    #     self.fer_txt = base64.b64encode(open(nombre, "rb").read())
+    #     return {
+    #         'type': 'ir.actions.act_url',
+    #         'name': 'contract',
+    #         'url': '/web/content/purchase.order/%s/fer_txt/%s?download=true' %(self.id,nombre),
+    #     }
 
 class IrAttachment(models.Model):
     _inherit = "ir.attachment"
