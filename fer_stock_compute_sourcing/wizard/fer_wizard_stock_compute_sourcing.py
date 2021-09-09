@@ -155,7 +155,7 @@ class FerWizardStockComputeSourcing(models.TransientModel):
                 self.fer_make_dictionary_templates(dic_cumulative, key, cumulative)
 
             # Obtener acumulados
-            participative = sorted(dic_cumulative.items(), key=itemgetter(0), reverse=True)
+            participative = sorted(dic_cumulative.items(), key=itemgetter(1), reverse=True)
             cumulative = 0
             for tupla in participative:
                 for key in dic_cumulative.keys():
