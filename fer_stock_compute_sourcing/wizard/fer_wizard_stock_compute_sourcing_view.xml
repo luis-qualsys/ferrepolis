@@ -50,7 +50,7 @@
         <field name="view_mode">form</field>
         <field name="target">new</field>
     </record>
-
-    <menuitem action="fer_wizard_stock_compute_sourcing_action" id="fer_menu_sourcing_stock_compute" parent="stock.menu_stock_warehouse_mgmt"/>
+    
+    <menuitem action="fer_wizard_stock_compute_sourcing_action" id="fer_menu_sourcing_stock_compute" parent="menu_compute_stock_settings" sequence="100"/>
 
 </odoo>

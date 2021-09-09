@@ -28,7 +28,7 @@ class FerWizardStockComputeSourcing(models.TransientModel):
             dictionary['average'] = average
 
         weeks = self.fer_remove_weeks(weeks_list)
-        # self.fer_sale_data(products_setter)
+        # self.fer_sale_data(weeks, products_setter)
         # # products, averages, cumulative, words = self.fer_sale_data(products_setter)
         # # stock_history = self.fer_get_history_stock(products, averages, cumulative, words, products_setter['location'])
         # # stock_calculated = self.fer_get_min_max(stock_history)
@@ -159,8 +159,9 @@ class FerWizardStockComputeSourcing(models.TransientModel):
 
         return products_setter
 
-    def fer_sale_data(self, products_range):
+    def fer_sale_data(self, weeks, products_range):
         dic_products = dict()
+        dic_stock = dict()
         dic_averages = dict()
         dic_cumulative = dict()
         dic_words = dict()
@@ -169,31 +170,44 @@ class FerWizardStockComputeSourcing(models.TransientModel):
             prodt = True
         else:
             prodt = False
-        for record in self:
+        for week in weeks:
             domain = [
-                ('date', '>=', record.fer_date_init),
-                ('date', '<=', record.fer_date_end)]
+                ('date', '>=', week['week_ini']),
+                ('date', '<=', week['week_end'])]
             stock_move = self.env['stock.move.line'].search(domain)
-
+            timelapse = week['week_end'] - week['week_ini']
+            print(timelapse.days())
             # Obtener productos
             if prodt:
                 for stock in stock_move:
                     if int(stock.product_id.default_code) in products_range['products_update']:
-                        if products_range['location'] in stock.location_id.display_name and stock.picking_location_dest_id.name == 'Customers':
-                            self.fer_make_dictionary_templates(dic_products, stock.product_id.id, stock.qty_done)
+                        if products_range['brand']:
+                            if stock.picking_location_dest_id.name == 'Customers' and stock.product_id.fer_brand_ids.fer_brand_name == products_range['brand']:
+                                self.fer_make_dictionary_templates(dic_products, stock.product_id.id, stock.qty_done)
+                                if 'Piso' not in stock.location_id.display_name:
+                                    dic_stock[stock.product_id.id] = stock.location_id.display_name
+                        else:
+                            if stock.picking_location_dest_id.name == 'Customers':
+                                self.fer_make_dictionary_templates(dic_products, stock.product_id.id, stock.qty_done)
+                                if 'Piso' not in stock.location_id.display_name:
+                                    dic_stock[stock.product_id.id] = stock.location_id.display_name
                     else:
                         continue
             else:
                 for stock in stock_move:
-                    if products_range['location'] in stock.location_id.display_name and stock.picking_location_dest_id.name == 'Customers':
-                        self.fer_make_dictionary_templates(dic_products, stock.product_id.id, stock.qty_done)
+                    if products_range['brand']:
+                        if stock.picking_location_dest_id.name == 'Customers' and stock.product_id.fer_brand_ids.fer_brand_name == products_range['brand']:
+                            self.fer_make_dictionary_templates(dic_products, stock.product_id.id, stock.qty_done)
+                            if 'Piso' not in stock.location_id.display_name:
+                                    dic_stock[stock.product_id.id] = stock.location_id.display_name
+                    else:
+                        if stock.picking_location_dest_id.name == 'Customers':
+                            self.fer_make_dictionary_templates(dic_products, stock.product_id.id, stock.qty_done)
+                            if 'Piso' not in stock.location_id.display_name:
+                                    dic_stock[stock.product_id.id] = stock.location_id.display_name
 
             # Obtener promedios
             for key in dic_products.keys():
-                if key in invoices_desc:
-                    average = (dic_products[key] - invoices_desc[key]) / record.fer_timelapse
-                    self.fer_make_dictionary_templates(dic_averages, key, average)
-                else:
                     average = dic_products[key] / record.fer_timelapse
                     self.fer_make_dictionary_templates(dic_averages, key, average)
 
@@ -215,7 +229,7 @@ class FerWizardStockComputeSourcing(models.TransientModel):
                     continue
                 else:
                     self.fer_make_dictionary_templates(dic_words, key, 'C')
-        print(dic_products, dic_averages, dic_cumulative, dic_words, invoices_desc)
+        print(dic_products, dic_averages, dic_cumulative, dic_words)
         return dic_products, dic_averages, dic_cumulative, dic_words
 
     def fer_maker_dictionary_array(self, dic_products, dic_averages, dic_cumulative, dic_words, new_data):

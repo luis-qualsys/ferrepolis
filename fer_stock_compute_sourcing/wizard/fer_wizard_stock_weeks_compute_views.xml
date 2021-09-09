@@ -9,9 +9,9 @@
                 <sheet>
                     <group>
                         <group>
-                            <field name="fer_date_now"/>
                             <field name="location_id"/>
                             <field name="fer_product_init"/>
+                            <field name="fer_date_now"/>
                         </group>
                         <group>
                             <field name="fer_brand"/>
@@ -44,5 +44,5 @@
         <field name="target">new</field>
     </record>
 
-    <menuitem action="fer_wizard_stock_weeks_compute_action" id="fer_menu_sourcing_stock_weeks_compute" parent="stock.menu_stock_warehouse_mgmt"/>
+    <menuitem action="fer_wizard_stock_weeks_compute_action" id="fer_menu_sourcing_stock_weeks_compute" parent="menu_compute_stock_settings" sequence="100"/>
 </odoo>

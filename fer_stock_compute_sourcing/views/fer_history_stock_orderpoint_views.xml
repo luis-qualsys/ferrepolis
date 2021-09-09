@@ -69,5 +69,6 @@
         </field>
     </record>
     <!-- This Menu Item must have a parent and an action -->
-    <menuitem id="fer_history_stock_orderpoint_menu" name="Aplicar reglas de stock" parent="stock.menu_stock_warehouse_mgmt" action="fer_history_stock_orderpoint_action" />
+    <menuitem id="menu_compute_stock_settings" name="Calculos Stock" parent="stock.menu_stock_warehouse_mgmt" sequence="100"/>
+    <menuitem id="fer_history_stock_orderpoint_menu" name="Aplicar reglas de stock" parent="menu_compute_stock_settings" action="fer_history_stock_orderpoint_action" sequence="102"/>
 </odoo>

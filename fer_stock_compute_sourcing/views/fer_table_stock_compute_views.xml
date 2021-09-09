@@ -14,7 +14,7 @@
                         </p>
                     </div>
                     <notebook>
-                        <page string="Clasificador de Stock">
+                        <page string="Parámetros de stock">
                             <group>
                                 <field name="fer_letters_id">
                                     <tree editable="bottom">
@@ -34,11 +34,12 @@
 
     <!-- fer_stock_computer_parms action window -->
     <record id="fer_stock_computer_parms_action" model="ir.actions.act_window">
-        <field name="name">Parámetros de abastecimiento</field>
+        <field name="name">Parámetros de stock</field>
         <field name="type">ir.actions.act_window</field>
         <field name="res_model">fer.stock.computer.parms</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">form</field>
+        <field name="res_id">1</field>
     </record>
 
-    <menuitem id="fer_table_stock_computer_parms_menu" name="Configuraciones de abastecimiento" parent="stock.menu_product_in_config_stock" action="fer_stock_computer_parms_action" />
+    <menuitem id="fer_table_stock_computer_parms_menu" name="Parámetros de stock" parent="stock.menu_product_in_config_stock" action="fer_stock_computer_parms_action" sequence="100"/>
 </odoo>

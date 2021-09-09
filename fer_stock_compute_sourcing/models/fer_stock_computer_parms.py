@@ -13,7 +13,7 @@ class FerStockComputerParms(models.Model):
     @api.depends()
     def _fer_compute_get_name(self):
         for table in self:
-            table.fer_table_name = 'Tabla de abastecimiento'
+            table.fer_table_name = 'Parámetros de stock'
 
 class ferLetters(models.Model):
     _name = 'fer.letters'
