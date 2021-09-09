@@ -165,6 +165,7 @@ class FerWizardStockComputeSourcing(models.TransientModel):
         dic_averages = dict()
         dic_cumulative = dict()
         dic_words = dict()
+        timelapse = 0
 
         if products_range['products_update']:
             prodt = True
@@ -175,7 +176,7 @@ class FerWizardStockComputeSourcing(models.TransientModel):
                 ('date', '>=', week['week_ini']),
                 ('date', '<=', week['week_end'])]
             stock_move = self.env['stock.move.line'].search(domain)
-            timelapse = week['week_end'] - week['week_ini']
+            timelapse += self.fer_days_lab
             print(timelapse.days())
             # Obtener productos
             if prodt:
@@ -184,13 +185,9 @@ class FerWizardStockComputeSourcing(models.TransientModel):
                         if products_range['brand']:
                             if stock.picking_location_dest_id.name == 'Customers' and stock.product_id.fer_brand_ids.fer_brand_name == products_range['brand']:
                                 self.fer_make_dictionary_templates(dic_products, stock.product_id.id, stock.qty_done)
-                                if 'Piso' not in stock.location_id.display_name:
-                                    dic_stock[stock.product_id.id] = stock.location_id.display_name
                         else:
                             if stock.picking_location_dest_id.name == 'Customers':
                                 self.fer_make_dictionary_templates(dic_products, stock.product_id.id, stock.qty_done)
-                                if 'Piso' not in stock.location_id.display_name:
-                                    dic_stock[stock.product_id.id] = stock.location_id.display_name
                     else:
                         continue
             else:
@@ -198,37 +195,33 @@ class FerWizardStockComputeSourcing(models.TransientModel):
                     if products_range['brand']:
                         if stock.picking_location_dest_id.name == 'Customers' and stock.product_id.fer_brand_ids.fer_brand_name == products_range['brand']:
                             self.fer_make_dictionary_templates(dic_products, stock.product_id.id, stock.qty_done)
-                            if 'Piso' not in stock.location_id.display_name:
-                                    dic_stock[stock.product_id.id] = stock.location_id.display_name
                     else:
                         if stock.picking_location_dest_id.name == 'Customers':
                             self.fer_make_dictionary_templates(dic_products, stock.product_id.id, stock.qty_done)
-                            if 'Piso' not in stock.location_id.display_name:
-                                    dic_stock[stock.product_id.id] = stock.location_id.display_name
 
-            # Obtener promedios
-            for key in dic_products.keys():
-                    average = dic_products[key] / record.fer_timelapse
-                    self.fer_make_dictionary_templates(dic_averages, key, average)
+        # Obtener promedios
+        for key in dic_products.keys():
+                average = dic_products[key] / record.fer_timelapse
+                self.fer_make_dictionary_templates(dic_averages, key, average)
 
-            # Obtener acumulados
-            for key in dic_averages.keys():
-                cumulative = (dic_averages[key] / sum(dic_averages.values())) * 100
-                self.fer_make_dictionary_templates(dic_cumulative, key, cumulative)
+        # Obtener acumulados
+        for key in dic_averages.keys():
+            cumulative = (dic_averages[key] / sum(dic_averages.values())) * 100
+            self.fer_make_dictionary_templates(dic_cumulative, key, cumulative)
 
-            # Asignación de Letras
-            word = self.env['fer.letters'].search([])
-            letters = {item.fer_letter:item.fer_percent for item in word}
-            for key in dic_cumulative.keys():
-                val =  100 - dic_cumulative[key]
-                if letters['A'] >= val:
-                    self.fer_make_dictionary_templates(dic_words, key, 'A')
-                    continue
-                if letters['A'] < val or val <= letters['B']:
-                    self.fer_make_dictionary_templates(dic_words, key, 'B')
-                    continue
-                else:
-                    self.fer_make_dictionary_templates(dic_words, key, 'C')
+        # Asignación de Letras
+        word = self.env['fer.letters'].search([])
+        letters = {item.fer_letter:item.fer_percent for item in word}
+        for key in dic_cumulative.keys():
+            val =  100 - dic_cumulative[key]
+            if letters['A'] >= val:
+                self.fer_make_dictionary_templates(dic_words, key, 'A')
+                continue
+            if letters['A'] < val or val <= letters['B']:
+                self.fer_make_dictionary_templates(dic_words, key, 'B')
+                continue
+            else:
+                self.fer_make_dictionary_templates(dic_words, key, 'C')
         print(dic_products, dic_averages, dic_cumulative, dic_words)
         return dic_products, dic_averages, dic_cumulative, dic_words
 
