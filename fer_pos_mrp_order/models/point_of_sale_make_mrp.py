@@ -47,6 +47,8 @@ class MrpProduction(models.Model):
                                 'lot_producing_id': False,
                                 'message_ids': [],
                                 'move_byproduct_ids': [],
+                                'location_src_id': bom.picking_type_id.default_location_src_id.id,
+                                'location_dest_id': bom.picking_type_id.default_location_dest_id.id,
                             }
                             mrp_order = self.env['mrp.production'].new(vals)
                             mrp_order.onchange_product_id()
