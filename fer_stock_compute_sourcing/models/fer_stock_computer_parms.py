@@ -6,14 +6,14 @@ class FerStockComputerParms(models.Model):
     _description = 'Parametros para cálculos de reabastecimiento de stock'
     _rec_name = 'fer_table_name'
 
-
-    fer_table_name = fields.Char(compute='_fer_compute_get_name', string="Nombre")
+    fer_table_name = fields.Char(compute='_fer_compute_get_name', string="Nombre", store=True)
     fer_letters_id = fields.One2many('fer.letters','fer_stock_computer_parm_ids', 'Letras')
+    location_ids = fields.Many2one('stock.location', string='Ubicación')
 
-    @api.depends()
+    @api.depends('location_ids')
     def _fer_compute_get_name(self):
         for table in self:
-            table.fer_table_name = 'Parámetros de stock'
+            table.fer_table_name = self.location_ids.complete_name
 
 class ferLetters(models.Model):
     _name = 'fer.letters'

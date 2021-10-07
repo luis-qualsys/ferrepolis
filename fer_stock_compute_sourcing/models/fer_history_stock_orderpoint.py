@@ -5,8 +5,9 @@ class FerHistoryStockOrderpoint(models.Model):
     _name = "fer.history.stock.orderpoint"
     _description = "Historial de abastecimiento"
     _rec_name = 'fer_name'
+    _order = 'fer_name desc'
 
-    fer_name = fields.Char(string='Nombre', compute='_fer_get_name')
+    fer_name = fields.Char(string='Nombre', compute='_fer_get_name', store=True)
     fer_timestamp = fields.Datetime(string='Fecha de cálculo', default=lambda date: fields.Datetime.now(), required=True, readonly=True)
     # fer_description = fields.Char(string="Descripción del cálculo")
     fer_stock_rules_efim_ids = fields.One2many('fer.stock.warehouse.orderpoint.efim', 'fer_history_stock_orderpoint_ids', string="Historial de reglas abastecimiento")
@@ -17,6 +18,17 @@ class FerHistoryStockOrderpoint(models.Model):
                 ('restored', 'Restaurado'),
                 ('cancelled', 'Cancelado')
                 ])
+    location_id = fields.Char(string='Ubicación', readonly=True)
+    fer_date_init = fields.Date(string='Fecha de inicio', readonly=True)
+    fer_date_end = fields.Date(string='Fecha de termino', readonly=True)
+    fer_brand = fields.Char(string='Marca', readonly=True)
+    fer_prod_init = fields.Char(string='Producto inicial', readonly=True)
+    fer_prod_end = fields.Char(string='Producto final', readonly=True)
+    fer_origin = fields.Selection(string='Origen', default='stock',
+            selection=[
+                ('stock', 'Cálculo de Stock'),
+                ('stock_week', 'Cálculo de Stock por Semanas')
+                ], readonly=True)
 
     @api.depends('fer_timestamp')
     def _fer_get_name(self):
@@ -62,7 +74,6 @@ class FerHistoryStockOrderpoint(models.Model):
                     'qty_multiple': 1,
                     'trigger': 'auto'
                         }])
-                print('Create else')
 
         self.fer_state = 'applied'
         return {'type': 'ir.actions.client', 'tag': 'reload'}

@@ -6,10 +6,10 @@ class FerComputeModelSearch(models.Model):
     _description = 'Modelo de busqueda para calculos'
 
     # Data for compute
-    fer_product_id_init = fields.Integer(string='Producto inicial')
-    fer_product_id_end = fields.Integer(string='Producto final')
+    fer_product_id_init = fields.Integer()
+    fer_product_id_end = fields.Integer()
     warehouse_id = fields.Many2one('stock.warehouse', string='Almacen')
-    location_id = fields.Many2one('stock.location', string='Ubicación', required=True)
+    location_id = fields.Many2one('stock.location', string='Ubicación', domain=[('fer_search_flag', '=', True)], required=True)
     fer_brand = fields.Many2one('fer.product.brand', string='Marca')
     fer_date_init = fields.Date(string='Periodo de inicio', required=True, default=lambda date: fields.Date.today() - relativedelta(days=10))
     fer_date_end = fields.Date(string='Periodo de termino', default=lambda date: fields.Date.today(), required=True)
@@ -47,4 +47,19 @@ class FerComputeModelSearch(models.Model):
             else:
                 record.fer_range_ids = 1
 
-    
+    @api.model
+    def default_get(self, fields):
+        mode = super(FerComputeModelSearch, self).default_get(fields)
+        lines_suggest = [(6,0,0)]
+        locations = self.env['fer.stock.computer.parms'].search([('id', '=', 1)])
+        ids = 0
+        for loc in locations[0].location_ids:
+            ids = loc.id
+            lines_suggest.append((0, 0, {
+                'id': loc.id,
+                'complete_name': loc.complete_name
+            }))
+        mode.update({
+            'location_id': ids,
+        })
+        return mode
