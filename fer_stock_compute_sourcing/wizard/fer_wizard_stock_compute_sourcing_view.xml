@@ -13,13 +13,13 @@
                         <group>
                             <group>
                                 <field name="location_id"/>
-                                <field name="fer_product_id_init"/>
+                                <field name="fer_product_id_initial"/>
                                 <field name="fer_date_init"/>
                                 <field name="fer_omit_days"/>
                             </group>
                             <group>
                                 <field name="fer_brand"/>
-                                <field name="fer_product_id_end"/>
+                                <field name="fer_product_id_ended"/>
                                 <field name="fer_date_end"/>
                                 <field name="fer_check_selector" widget="radio"/>
                             </group>

@@ -9,6 +9,9 @@ class FerWizardStockComputeSourcing(models.TransientModel):
     _inherit = ['fer.compute.model.search']
     _description = 'Calculo de abastecimiento'
 
+    fer_product_id_initial = fields.Many2one('product.product', string='Producto inicial')
+    fer_product_id_ended = fields.Many2one('product.product', string='Producto final')
+
     def sourcing_calculation(self):
         # Crear historial de calculos pasados
         products_setter = self.fer_setter_init_values()
@@ -29,11 +32,19 @@ class FerWizardStockComputeSourcing(models.TransientModel):
 
     def fer_maker_history_records(self, stock_to_created):
         datetime = fields.Datetime.now()
-        self.env['fer.history.stock.orderpoint'].sudo().create({'fer_timestamp': datetime})
+        self.env['fer.history.stock.orderpoint'].sudo().create({
+            'fer_timestamp': datetime,
+            'fer_date_init': self.fer_date_init,
+            'fer_date_end': self.fer_date_end,
+            'location_id': self.location_id.complete_name,
+            'fer_brand': self.fer_brand.fer_brand_name,
+            'fer_origin': 'stock',
+            'fer_prod_init': self.fer_product_id_initial.default_code,
+            'fer_prod_end': self.fer_product_id_ended.default_code,
+            })
 
         hist_efim = self.env['fer.history.stock.orderpoint'].search([('fer_timestamp', '=', datetime)])
         for data in stock_to_created:
-            print(data)
             hist_efim.write({'fer_stock_rules_efim_ids': [(0, 0, data)]})
         
         _logger.info("Registro de reglas de stock creado %s" % hist_efim.id)
@@ -41,31 +52,31 @@ class FerWizardStockComputeSourcing(models.TransientModel):
 
     def fer_get_min_max(self, stock_to_created):
         for stock in stock_to_created:
-            # print(stock['default_code'])
-            product = self.env['fer.letters'].search([
-                ('fer_letter', '=', stock['fer_product_letter'])
-                ])
-            stk_min = round(product.fer_days_min_stock * stock['fer_product_average']) # Comentar si no se cacula el minimo
-            stk_max = round(product.fer_days_max_stock * stock['fer_product_average'])
-            # if stk_max < stock['fer_old_product_min']:
-            # stock['fer_c_product_min'] = stock['fer_old_product_min']
-            # stock['fer_c_product_max'] = stock['fer_old_product_max']
-            # else:
-            #     stock['fer_c_product_min'] = stock['fer_old_product_min'] # Descomentar si no se cacula el minimo
-            stock['fer_c_product_min'] = stk_min
-            stock['fer_c_product_max'] = stk_max
-
+            words = self.env['fer.stock.computer.parms'].search([('location_ids', '=', self.location_id.id)], limit=1).mapped('fer_letters_id')
+            for item in words:
+                if item.fer_letter == stock['fer_product_letter']:
+                    stk_min = round(item.fer_days_min_stock * stock['fer_product_average'])
+                    stk_max = round(item.fer_days_max_stock * stock['fer_product_average'])
+                    stock['fer_c_product_min'] = stk_min
+                    stock['fer_c_product_max'] = stk_max
         return stock_to_created
 
     def fer_setter_init_values(self):
         products_setter = dict()
         # Setter inputs
         for record in self:
-            products_update = [item for item in range(record.fer_product_id_init, record.fer_product_id_end+1) if item != 0]
-            if len(products_update) == 0:
-                products_setter['products_update'] = None
+            prods = self.env['product.template'].search([('type', 'ilike', 'product')]).mapped('default_code')
+            if record.fer_product_id_initial and record.fer_product_id_ended:
+                prods.sort()
+                initial = 0
+                final = -1
+                if record.fer_product_id_initial.default_code in prods:
+                    initial = prods.index(record.fer_product_id_initial.default_code)
+                if record.fer_product_id_ended.default_code in prods:
+                    final = prods.index(record.fer_product_id_ended.default_code) + 1
+                products_setter['products_update'] = prods[initial:final]
             else:
-                products_setter['products_update'] = products_update
+                products_setter['products_update'] = prods
 
             if record.fer_brand.fer_brand_name:
                 products_setter['brand'] = record.fer_brand.fer_brand_name
@@ -94,16 +105,13 @@ class FerWizardStockComputeSourcing(models.TransientModel):
         dic_cumulative = dict()
         dic_participation = dict()
         dic_words = dict()
+        picking_locations = ['Customers', 'Production']
 
         if products_range['partners'] or products_range['accounts']:
             invoices_desc = self.fer_get_invoices_partner(products_range['accounts'], products_range['partners'])
         else: 
             invoices_desc = {}
 
-        if products_range['products_update']:
-            prodt = True
-        else:
-            prodt = False
         for record in self:
             domain = [
                 ('date', '>=', record.fer_date_init),
@@ -111,24 +119,13 @@ class FerWizardStockComputeSourcing(models.TransientModel):
             stock_move = self.env['stock.move.line'].search(domain)
 
             # Obtener productos
-            if prodt:
-                for stock in stock_move:
-                    if int(stock.product_id.default_code) in products_range['products_update']:
-                        if products_range['brand']:
-                            if stock.picking_location_dest_id.name == 'Customers' and stock.product_id.fer_brand_ids.fer_brand_name == products_range['brand']:
-                                self.fer_make_dictionary_templates(dic_products, stock.product_id.id, stock.qty_done)
-                        else:
-                            if stock.picking_location_dest_id.name == 'Customers':
-                                self.fer_make_dictionary_templates(dic_products, stock.product_id.id, stock.qty_done)
-                    else:
-                        continue
-            else:
-                for stock in stock_move:
+            for stock in stock_move:
+                if stock.product_id.default_code in products_range['products_update']:
                     if products_range['brand']:
-                        if stock.picking_location_dest_id.name == 'Customers' and stock.product_id.fer_brand_ids.fer_brand_name == products_range['brand']:
+                        if stock.picking_location_dest_id.name in picking_locations and stock.product_id.fer_brand_ids.fer_brand_name == products_range['brand']:
                             self.fer_make_dictionary_templates(dic_products, stock.product_id.id, stock.qty_done)
                     else:
-                        if stock.picking_location_dest_id.name == 'Customers':
+                        if stock.picking_location_dest_id.name in picking_locations:
                             self.fer_make_dictionary_templates(dic_products, stock.product_id.id, stock.qty_done)
 
             # Obtener promedios
@@ -155,8 +152,9 @@ class FerWizardStockComputeSourcing(models.TransientModel):
                         self.fer_make_dictionary_templates(dic_participation, tupla[0], cumulative)
 
             # Asignación de Letras
-            word = self.env['fer.letters'].search([])
-            letters = {item.fer_letter:item.fer_percent for item in word}
+            word = self.env['fer.stock.computer.parms'].search([('location_ids', '=', self.location_id.id)], limit=1)
+            words = word.mapped('fer_letters_id')
+            letters = {item.fer_letter:item.fer_percent for item in words}
             for key in dic_participation.keys():
                 val =  dic_participation[key]
                 if letters['C'] == round(val):
@@ -167,8 +165,7 @@ class FerWizardStockComputeSourcing(models.TransientModel):
                     continue
                 else:
                     self.fer_make_dictionary_templates(dic_words, key, 'A')
-        _logger.info("Calculos finalizados")
-        # print(dic_products, dic_stock, dic_averages, dic_cumulative, dic_words, dic_participation)
+
         return dic_products, dic_averages, dic_cumulative, dic_words, dic_participation
 
     def fer_maker_dictionary_array(self, dic_products, dic_averages, dic_cumulative, dic_words, new_data):
@@ -219,14 +216,7 @@ class FerWizardStockComputeSourcing(models.TransientModel):
     def fer_get_history_stock(self, products, averages, cumulative, words, participation):
         old_stock_rules = self.env['stock.warehouse.orderpoint'].search([])
         stock_dicts = list()
-        # common_keys = list()
-
         prod_keys = [key for key in products.keys()]
-        # rule_keys = [rule.product_id.id for rule in old_stock_rules]
-        # for key in prod_keys:
-        #     if key in rule_keys:
-        #         common_keys.append(key)
-        #         # prod_keys.remove(key)
 
         for rule in old_stock_rules:
             if rule.product_id.id in prod_keys:

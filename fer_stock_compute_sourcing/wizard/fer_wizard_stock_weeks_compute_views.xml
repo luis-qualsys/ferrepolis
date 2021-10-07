@@ -10,12 +10,12 @@
                     <group>
                         <group>
                             <field name="location_id"/>
-                            <field name="fer_product_init"/>
+                            <field name="fer_product_id_initial"/>
                             <field name="fer_date_now"/>
                         </group>
                         <group>
                             <field name="fer_brand"/>
-                            <field name="fer_product_end"/>
+                            <field name="fer_product_id_ended"/>
                         </group>
                     </group>
                     <notebook>
