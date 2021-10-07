@@ -5,7 +5,7 @@
         <field name="name">fer.history.stock.orderpoint.view.form</field>
         <field name="model">fer.history.stock.orderpoint</field>
         <field name="arch" type="xml">
-            <form string="">
+            <form create="false">
                 <header>
                     <button name="action_calculed_recover" string="Validar" class="btn-primary" type="object" attrs="{'invisible': [('fer_state', '!=', 'draft')]}"/>
                     <button name="action_hist_recover" string="Restaurar" class="btn-primary" type="object" attrs="{'invisible': [('fer_state', '!=', 'applied')]}"/>
@@ -15,11 +15,24 @@
                 </header>
                 <sheet>
                     <group>
-                        <!-- <group>
-                            <field name="fer_description"/>
-                        </group> -->
                         <group>
+                            <field name="fer_name"/>
                             <field name="fer_timestamp"/>
+                            <field name="fer_origin"/>
+                        </group>
+                        <group>
+                            <field name="location_id"/>
+                            <field name="fer_date_init" attrs="{'invisible': [('fer_origin', '=', 'stock_week')]}"/>
+                            <field name="fer_date_end" attrs="{'invisible': [('fer_origin', '=', 'stock_week')]}"/>
+                            <field name="fer_brand"/>
+                            <label for="fer_prod_init" string="Rango de productos"/>
+                            <div class="o_row no-gutters d-flex">
+                                <div class="o_row">
+                                    <field name="fer_prod_init" class="text-left"/>
+                                </div>
+                                <span class="text-bf">hasta</span>
+                                <field name="fer_prod_end" class="oe_inline text-left"/>
+                            </div>
                         </group>
                     </group>
                     <notebook>
@@ -32,6 +45,11 @@
                                     <field name="fer_c_product_max"/>
                                     <field name="fer_old_product_min"/>
                                     <field name="fer_old_product_max"/>
+                                    <field name="fer_product_average" optional="hide"/>
+                                    <field name="fer_product_cumulative" optional="hide"/>
+                                    <field name="fer_product_letter" optional="hide"/>
+                                    <field name="fer_product_participation" optional="hide"/>
+                                    <field name="fer_qty_done" optional="hide"/>
                                 </tree>
                             </field>
                         </page>
@@ -46,7 +64,7 @@
         <field name="name">fer.history.stock.orderpoint.view.tree</field>
         <field name="model">fer.history.stock.orderpoint</field>
         <field name="arch" type="xml">
-            <tree>
+            <tree create="false">
                 <field name="fer_name"/>
                 <!-- <field name="fer_description"/> -->
                 <field name="fer_state" optional="show" widget="badge" decoration-danger="fer_state == 'cancelled'" decoration-success="fer_state == 'applied'" decoration-info="fer_state == 'restored'" decoration-muted="fer_state == 'draft'"/>
@@ -63,7 +81,8 @@
         <field name="help" type="html">
             <p class="oe_view_nocontent_create">
                 Aplicar reglas de stock
-            </p><p>
+            </p>
+            <p>
                 Almacenamiento de reglas de abastecimiento de stock.
             </p>
         </field>

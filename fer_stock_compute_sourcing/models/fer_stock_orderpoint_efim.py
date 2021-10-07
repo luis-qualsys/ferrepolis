@@ -6,7 +6,6 @@ class FerStockWarehouseOrderpointEfim(models.Model):
     _description = 'Stock valores efimeros'
 
     product_id = fields.Many2one('product.product', string='Producto')
-    # warehouse_id = fields.Many2one('stock.warehouse', string='Almacen')
     location_id = fields.Many2one('stock.location', string='Ubicación')
     fer_c_product_min = fields.Integer('Cal mínima', default=0)
     fer_c_product_max = fields.Integer('Cal máxima', default=0)
