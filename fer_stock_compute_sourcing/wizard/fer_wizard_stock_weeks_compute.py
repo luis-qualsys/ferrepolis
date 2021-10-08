@@ -10,7 +10,7 @@ class FerWizardStockComputeSourcing(models.TransientModel):
     _name = 'fer.wizard.stock.weeks.compute'
     _description = 'Calculo de abastecimiento por semanas'
 
-    fer_date_now = fields.Date(string='Fecha de calculo', readonly=True, default=lambda date: fields.Date.today())
+    fer_date_now = fields.Datetime(string='Fecha de calculo', readonly=True, default=lambda date: fields.Datetime.now())
     fer_product_id_initial = fields.Many2one('product.product', string='Producto inicial', domain=[('type', 'ilike', 'product')])
     fer_product_id_ended = fields.Many2one('product.product', string='Producto final', domain=[('type', 'ilike', 'product')])
     location_id = fields.Many2one('stock.location', string='Ubicación', required=True, domain=[('fer_search_flag', '=', True)])
