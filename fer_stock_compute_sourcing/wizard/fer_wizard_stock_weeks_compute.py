@@ -11,8 +11,8 @@ class FerWizardStockComputeSourcing(models.TransientModel):
     _description = 'Calculo de abastecimiento por semanas'
 
     fer_date_now = fields.Date(string='Fecha de calculo', readonly=True, default=lambda date: fields.Date.today())
-    fer_product_id_initial = fields.Many2one('product.product', string='Producto inicial')
-    fer_product_id_ended = fields.Many2one('product.product', string='Producto final')
+    fer_product_id_initial = fields.Many2one('product.product', string='Producto inicial', domain=[('type', 'ilike', 'product')])
+    fer_product_id_ended = fields.Many2one('product.product', string='Producto final', domain=[('type', 'ilike', 'product')])
     location_id = fields.Many2one('stock.location', string='Ubicación', required=True, domain=[('fer_search_flag', '=', True)])
     fer_brand = fields.Many2one('fer.product.brand', string='Marca')
     fer_period_hist = fields.Integer(string='Periodo Historico', help='Mínimo 8 máximo 52 (semanas)', default=8)
@@ -212,6 +212,11 @@ class FerWizardStockComputeSourcing(models.TransientModel):
             self.fer_make_dictionary_templates(dic_averages, key, average)
 
         # Obtener acumulados
+        for key in dic_averages.keys():
+            cumulative = (dic_averages[key] / sum(dic_averages.values())) * 100
+            self.fer_make_dictionary_templates(dic_cumulative, key, cumulative)
+
+        # Obtener participation
         participative = sorted(dic_cumulative.items(), key=itemgetter(1), reverse=True)
         cumulative = 0
         for tupla in participative:

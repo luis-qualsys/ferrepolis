@@ -9,8 +9,8 @@ class FerWizardStockComputeSourcing(models.TransientModel):
     _inherit = ['fer.compute.model.search']
     _description = 'Calculo de abastecimiento'
 
-    fer_product_id_initial = fields.Many2one('product.product', string='Producto inicial')
-    fer_product_id_ended = fields.Many2one('product.product', string='Producto final')
+    fer_product_id_initial = fields.Many2one('product.product', string='Producto inicial', domain=[('type', 'ilike', 'product')])
+    fer_product_id_ended = fields.Many2one('product.product', string='Producto final', domain=[('type', 'ilike', 'product')])
 
     def sourcing_calculation(self):
         # Crear historial de calculos pasados
