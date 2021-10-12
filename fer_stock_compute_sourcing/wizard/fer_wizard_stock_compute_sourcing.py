@@ -18,7 +18,7 @@ class FerWizardStockComputeSourcing(models.TransientModel):
         products, averages, cumulative, words, participation = self.fer_sale_data(products_setter)
         stock_history = self.fer_get_history_stock(products, averages, cumulative, words, participation)
         stock_calculated = self.fer_get_min_max(stock_history)
-        last_id = self.fer_maker_history_records(stock_calculated)
+        last_id = self.fer_maker_history_records(stock_calculated, products_setter)
         
         return {
             'type': 'ir.actions.act_window',
@@ -30,7 +30,7 @@ class FerWizardStockComputeSourcing(models.TransientModel):
             'target': 'current',
             }
 
-    def fer_maker_history_records(self, stock_to_created):
+    def fer_maker_history_records(self, stock_to_created, products_setter):
         datetime = fields.Datetime.now()
         self.env['fer.history.stock.orderpoint'].sudo().create({
             'fer_timestamp': datetime,
@@ -39,8 +39,8 @@ class FerWizardStockComputeSourcing(models.TransientModel):
             'location_id': self.location_id.complete_name,
             'fer_brand': self.fer_brand.fer_brand_name,
             'fer_origin': 'stock',
-            'fer_prod_init': self.fer_product_id_initial.default_code,
-            'fer_prod_end': self.fer_product_id_ended.default_code,
+            'fer_prod_init': products_setter['products_update'][0],
+            'fer_prod_end': products_setter['products_update'][-1],
             })
 
         hist_efim = self.env['fer.history.stock.orderpoint'].search([('fer_timestamp', '=', datetime)])
@@ -115,18 +115,19 @@ class FerWizardStockComputeSourcing(models.TransientModel):
         for record in self:
             domain = [
                 ('date', '>=', record.fer_date_init),
-                ('date', '<=', record.fer_date_end)]
-            stock_move = self.env['stock.move.line'].search(domain)
+                ('date', '<=', record.fer_date_end),
+                ('state', '=', 'done')]
+            stock_move = self.env['stock.move'].search(domain)
 
             # Obtener productos
             for stock in stock_move:
                 if stock.product_id.default_code in products_range['products_update']:
                     if products_range['brand']:
-                        if stock.picking_location_dest_id.name in picking_locations and stock.product_id.fer_brand_ids.fer_brand_name == products_range['brand']:
-                            self.fer_make_dictionary_templates(dic_products, stock.product_id.id, stock.qty_done)
+                        if stock.location_dest_id.name in picking_locations and stock.product_id.fer_brand_ids.fer_brand_name == products_range['brand']:
+                            self.fer_make_dictionary_templates(dic_products, stock.product_id.id, stock.product_uom_qty)
                     else:
-                        if stock.picking_location_dest_id.name in picking_locations:
-                            self.fer_make_dictionary_templates(dic_products, stock.product_id.id, stock.qty_done)
+                        if stock.location_dest_id.name in picking_locations:
+                            self.fer_make_dictionary_templates(dic_products, stock.product_id.id, stock.product_uom_qty)
 
             # Obtener promedios
             for key in dic_products.keys():
