@@ -39,8 +39,8 @@ class FerWizardStockComputeSourcing(models.TransientModel):
             'location_id': self.location_id.complete_name,
             'fer_brand': self.fer_brand.fer_brand_name,
             'fer_origin': 'stock',
-            'fer_prod_init': products_setter['products_update'][0],
-            'fer_prod_end': products_setter['products_update'][-1],
+            'fer_prod_init': self.fer_product_id_initial.default_code,
+            'fer_prod_end': self.fer_product_id_ended.default_code,
             })
 
         hist_efim = self.env['fer.history.stock.orderpoint'].search([('fer_timestamp', '=', datetime)])
